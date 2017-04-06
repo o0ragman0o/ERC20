@@ -1,7 +1,7 @@
 /*
 file:   ERC20.sol
-ver:    0.3.0
-updated:31-Mar-2017
+ver:    0.4.0
+updated:6-April-2017
 author: Darryl Morris
 email:  o0ragman0o AT gmail.com
 
@@ -16,25 +16,26 @@ See MIT Licence for further details.
 
 pragma solidity ^0.4.10;
 
+import "https://github.com/o0ragman0o/ReentryProtected/ReentryProtected.sol";
+
 // ERC20 Standard Token Interface with safe maths and reentry protection
 contract ERC20Interface
 {
 /* Structs */
 
-/* Constants */
-    string constant public VERSION = "ERC20 0.3.0-o0ragman0o";
-
 /* State Valiables */
+
+    /// @return Total amount of tokens
     uint public totalSupply;
-    uint8 public decimalPlaces;
-    string public name;
+    
+    /// @return Token symbol
     string public symbol;
     
     // Token ownership mapping
     mapping (address => uint) balance;
     
-    // Transfer allowances mapping
-    mapping (address => mapping (address => uint)) public allowance;
+    /// Allowances mapping
+    mapping (address => mapping (address => uint)) allowed;
 
 /* Events */
     // Triggered when tokens are transferred.
@@ -53,49 +54,40 @@ contract ERC20Interface
 
 /* Function Abstracts */
 
-    /* State variable Accessor Functions (for reference - leave commented) */
+    /// @notice Send `_amount` of tokens from `msg.sender` to `_to`
+    /// @param _to The address of the recipient
+    /// @param _amount The amount of tokens to transfer
+    function transfer(address _to, uint256 _amount) external returns (bool);
 
-    // Returns the allowable transfer of tokens by a proxy
-    // function allowance (address tokenHolders, address proxy, uint allowance) public constant returns (uint);
+    /// @notice Send `_amount` of tokens from `_from` to `_to` on the condition
+    /// it is approved by `_from`
+    /// @param _from The address of the sender
+    /// @param _to The address of the recipient
+    /// @param _amount The amount of tokens to transfer
+    function transferFrom(address _from, address _to, uint256 _amount)
+        external returns (bool);
 
-    // Get the total token supply
-    // function totalSupply() public constant returns (uint);
-
-    // Returns token symbol
-    // function symbol() public constant returns(string);
-
-    // Returns token symbol
-    // function name() public constant returns(string);
-
-    // Returns decimal places designated for unit of token.
-    // function decimalPlaces() public returns(uint);
-
-    // Send _value amount of tokens to address _to
-    // function transfer(address _to, uint256 _value) public returns (bool success);
-
-    // Send _value amount of tokens from address _from to address _to
-    // function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
-
-    // Allow _spender to withdraw from your account, multiple times, up to the
-    // _value amount.
-    // function approve(address _spender, uint256 _value) public returns (bool success);
+    /// @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
+    /// its behalf
+    /// @param _spender The address of the approved spender
+    /// @param _amount The amount of tokens to transfer
+    function approve(address _spender, uint256 _amount) external returns (bool);
 }
 
-contract ERC20Token is ERC20Interface
+contract ERC20Token is ReentryProtected, ERC20Interface
 {
+
+/* Constants */
+    bytes32 constant public VERSION = "ERC20 0.4.0-o0ragman0o";
 
 /* Funtions Public */
 
     function ERC20Token(
         uint _supply,
-        uint8 _decimalPlaces,
-        string _symbol,
-        string _name)
+        string _symbol)
     {
         totalSupply = _supply;
-        decimalPlaces = _decimalPlaces;
         symbol = _symbol;
-        name = _name;
         balance[msg.sender] = totalSupply;
     }
         
@@ -106,11 +98,20 @@ contract ERC20Token is ERC20Interface
     {
         return balance[_addr];
     }
+    
+    function allowance(address _owner, address _spender)
+        public
+        constant
+        returns (uint remaining_)
+    {
+        return allowed[_owner][_spender];
+    }
+        
 
     // Send _value amount of tokens to address _to
     function transfer(address _to, uint256 _value)
         external
-        canEnter
+        noReentry
         returns (bool)
     {
         return xfer(msg.sender, _to, _value);
@@ -119,18 +120,19 @@ contract ERC20Token is ERC20Interface
     // Send _value amount of tokens from address _from to address _to
     function transferFrom(address _from, address _to, uint256 _value)
         external
-        canEnter
+        noReentry
         returns (bool)
     {
-        require(_value <= allowance[_from][msg.sender]);
+        require(_value <= allowed[_from][msg.sender]);
         uint __check;        
-        __check = allowance[_from][msg.sender];
-            allowance[_from][msg.sender] -= _value;
-        assert(allowance[_from][msg.sender] < __check);
+        __check = allowed[_from][msg.sender];
+            allowed[_from][msg.sender] -= _value;
+        assert(allowed[_from][msg.sender] < __check);
         
         return xfer(_from, _to, _value);
     }
 
+    // Process a transfer internally.
     function xfer(address _from, address _to, uint _value)
         internal
         returns (bool)
@@ -150,16 +152,13 @@ contract ERC20Token is ERC20Interface
         return true;
     }
     
-    // Allow _spender to withdraw from your account, multiple times, up to the
-    // _value amount. If this function is called again it overwrites the current
-    // allowance with _value.
     function approve(address _spender, uint256 _value)
         external
-        canEnter
+        noReentry
         returns (bool)
     {
         require(balance[msg.sender] != 0);
-        allowance[msg.sender][_spender] = _value;
+        allowed[msg.sender][_spender] = _value;
         Approval(msg.sender, _spender, _value);
         return true;
     }
