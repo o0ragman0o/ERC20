@@ -1,6 +1,6 @@
 /*
 file:   ERC20.sol
-ver:    0.4.0
+ver:    0.4.1-o0ragman0o
 updated:6-April-2017
 author: Darryl Morris
 email:  o0ragman0o AT gmail.com
@@ -78,19 +78,19 @@ contract ERC20Token is ReentryProtected, ERC20Interface
 {
 
 /* Constants */
-    bytes32 constant public VERSION = "ERC20 0.4.0-o0ragman0o";
+    bytes32 constant public VERSION = "ERC20 0.4.1-o0ragman0o";
 
 /* Funtions Public */
 
-    function ERC20Token(
-        uint _supply,
-        string _symbol)
+    function ERC20Token(uint _supply, string _symbol)
     {
+        require(_supply < 2**128);
         totalSupply = _supply;
         symbol = _symbol;
         balance[msg.sender] = totalSupply;
     }
-        
+    
+    // Using an explicit getter allows for function overloading    
     function balanceOf(address _addr)
         public
         constant
@@ -99,6 +99,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         return balance[_addr];
     }
     
+    // Using an explicit getter allows for function overloading    
     function allowance(address _owner, address _spender)
         public
         constant
@@ -124,11 +125,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         returns (bool)
     {
         require(_value <= allowed[_from][msg.sender]);
-        uint __check;        
-        __check = allowed[_from][msg.sender];
-            allowed[_from][msg.sender] -= _value;
-        assert(allowed[_from][msg.sender] < __check);
-        
+        allowed[_from][msg.sender] -= _value;
         return xfer(_from, _to, _value);
     }
 
@@ -137,21 +134,13 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         internal
         returns (bool)
     {
-        uint __check;
         require(_value <= balance[_from]);
-
-        __check = balance[_from];
-            balance[_from] -= _value;
-        assert(balance[_from] < __check);
-        
-        __check = balance[_to];
-            balance[_to] += _value;
-        assert(balance[_to] > __check);
-        
+        balance[_from] -= _value;
+        balance[_to] += _value;
         Transfer(_from, _to, _value);
         return true;
     }
-    
+
     function approve(address _spender, uint256 _value)
         external
         noReentry
