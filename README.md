@@ -7,18 +7,19 @@ author: Darryl Morris
 ```
 [{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]
 ```
+
 ## A Re-entry protected and overloadedable implimentation of the ERC20 token standard.
 
-This contract impliments the ERC20 API functions of `balanceOf()` `allowed()` 
-`transfer()` `transferFrom()` and `allowance()`.
+This contract impliments the ERC20 API functions of `totalSupply()` `balanceOf()`
+`allowed()` `transfer()` `transferFrom()` and `allowance()`.
 
 (Re-entry protection) [https://github.com/o0ragman0o/ReentryProtected] 
 on the state mutating functions prevents a malicious 
 contract from reentering the contract in an attempt to change state while in a
 different memory context.
 
-The `balanceOf()` and `allowed()` getters are explicitly defined to allow for
-function overloading in deriving contracts.
+The `totalSupply()` `balanceOf()` and `allowed()` getters are explicitly defined to allow for
+function overloading in deriving contracts where such contracts may return calculated values.
 
 ## Events
 
@@ -36,16 +37,22 @@ Triggered whenever approve(address _spender, uint256 _value) is called.
 
 ## Functions
 
+### totalSupply
+```
+function totalSupply() public constant returns (uint);
+```
+Returns the total supply of tokens
+
 ### balanceOf
 ```
-function balanceOf(address _addr) public returns (uint);
+function balanceOf(address _addr) public constant returns (uint);
 ```
 Returns the balance of tokens of a holder
 `_addr` The address of a token holder
 
 ### allowance
 ```
-function allowance(address _owner, address _spender) public returns (uint);
+function allowance(address _owner, address _spender) public constant returns (uint);
 ```
 Returns the amount of tokens the `_spender` is allowed to transfer
 `_owner` The address of a token holder
