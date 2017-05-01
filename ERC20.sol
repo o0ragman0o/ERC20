@@ -1,7 +1,7 @@
 /*
 file:   ERC20.sol
-ver:    0.4.1-o0ragman0o
-updated:6-April-2017
+ver:    0.4.2-o0ragman0o
+updated:1-May-2017
 author: Darryl Morris
 email:  o0ragman0o AT gmail.com
 
@@ -26,7 +26,7 @@ contract ERC20Interface
 /* State Valiables */
 
     /// @return Total amount of tokens
-    uint public totalSupply;
+    uint totSupply;
     
     /// @return Token symbol
     string public symbol;
@@ -54,6 +54,19 @@ contract ERC20Interface
 
 /* Function Abstracts */
 
+    /// @return The total supply of tokens
+    function totalSupply() public constant returns (uint);
+    
+    /// @param _addr The address of a token holder
+    /// @return The amount of tokens held by `_addr`
+    function balanceOf(address _addr) public constant returns (uint);
+
+    /// @param _owner The address of a token holder
+    /// @param _spender the address of a third-party
+    /// @return The amount of tokens the `_spender` is allowed to transfer
+    function allowance(address _owner, address _spender) public constant
+        returns (uint);
+
     /// @notice Send `_amount` of tokens from `msg.sender` to `_to`
     /// @param _to The address of the recipient
     /// @param _amount The amount of tokens to transfer
@@ -78,16 +91,27 @@ contract ERC20Token is ReentryProtected, ERC20Interface
 {
 
 /* Constants */
-    bytes32 constant public VERSION = "ERC20 0.4.1-o0ragman0o";
+    bytes32 constant public VERSION = "ERC20 0.4.2-o0ragman0o";
 
 /* Funtions Public */
 
     function ERC20Token(uint _supply, string _symbol)
     {
+        // Supply limited to 2^128 rather than 2^256 to prevent potential 
+        // multiplication overflow
         require(_supply < 2**128);
-        totalSupply = _supply;
+        totSupply = _supply;
         symbol = _symbol;
-        balance[msg.sender] = totalSupply;
+        balance[msg.sender] = totSupply;
+    }
+    
+    // Using an explicit getter allows for function overloading    
+    function totalSupply()
+        public
+        constant
+        returns (uint)
+    {
+        return totSupply;
     }
     
     // Using an explicit getter allows for function overloading    
@@ -110,6 +134,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         
 
     // Send _value amount of tokens to address _to
+    // Reentry protection prevents attacks upon the state
     function transfer(address _to, uint256 _value)
         external
         noReentry
@@ -119,6 +144,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
     }
 
     // Send _value amount of tokens from address _from to address _to
+    // Reentry protection prevents attacks upon the state
     function transferFrom(address _from, address _to, uint256 _value)
         external
         noReentry
@@ -134,13 +160,15 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         internal
         returns (bool)
     {
-        require(_value <= balance[_from]);
+        require(_value > 0 && _value <= balance[_from]);
         balance[_from] -= _value;
         balance[_to] += _value;
         Transfer(_from, _to, _value);
         return true;
     }
 
+    // Approves a third-party spender
+    // Reentry protection prevents attacks upon the state
     function approve(address _spender, uint256 _value)
         external
         noReentry
