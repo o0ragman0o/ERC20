@@ -1,39 +1,29 @@
 # ERC20
+### A Re-entry protected and overloadedable implimentation of the ERC20 token standard.
+
 0.4.2-o0ragman0o
+
 updated:1-May-2017
+
 author: Darryl Morris
+
 
 ## ABI
 ```
 [{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]
 ```
 
-## A Re-entry protected and overloadedable implimentation of the ERC20 token standard.
-
 This contract impliments the ERC20 API functions of `totalSupply()` `balanceOf()`
 `allowed()` `transfer()` `transferFrom()` and `allowance()`.
 
-(Re-entry protection) [https://github.com/o0ragman0o/ReentryProtected] 
+[Re-entry protection](https://github.com/o0ragman0o/ReentryProtected)
 on the state mutating functions prevents a malicious 
 contract from reentering the contract in an attempt to change state while in a
 different memory context.
 
-The `totalSupply()` `balanceOf()` and `allowed()` getters are explicitly defined to allow for
+The `totalSupply()` `balanceOf()` and `allowance()` getters are explicitly defined to allow for
 function overloading in deriving contracts where such contracts may return calculated values.
-
-## Events
-
-### Transfer
-```
-event Transfer(address indexed _from, address indexed _to, uint256 _value);`
-```
-Triggered when tokens are transferred.
-
-### Approval
-```
-event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-```
-Triggered whenever approve(address _spender, uint256 _value) is called.
+The respective internal state variables are `totSupply` `balance` and `allowed`
 
 ## Functions
 
@@ -84,3 +74,17 @@ function approve(address _spender, uint256 _amount) external returns (bool);
 Approves and amount of tokens that can be sent by a thrid-party
 `_spender` The address of the approved spender
 `_amount` The amount of tokens to transfer
+
+## Events
+
+### Transfer
+```
+event Transfer(address indexed _from, address indexed _to, uint256 _value);`
+```
+Triggered when tokens are transferred.
+
+### Approval
+```
+event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+```
+Triggered whenever approve(address _spender, uint256 _value) is called.
