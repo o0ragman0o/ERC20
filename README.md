@@ -1,18 +1,20 @@
 # ERC20
 ### A Re-entry protected and overloadedable implimentation of the ERC20 token standard.
 
-0.4.2-o0ragman0o
+0.4.3-o0ragman0o
 
-updated:1-May-2017
+updated:26-July-2017
 
 author: Darryl Morris
 
+license: MIT
 
-## ABI
+### ABI
 ```
 [{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]
 ```
 
+## Overview
 This contract impliments the ERC20 API functions of `totalSupply()` `balanceOf()`
 `allowed()` `transfer()` `transferFrom()` and `allowance()`.
 
@@ -24,6 +26,11 @@ different memory context.
 The `totalSupply()` `balanceOf()` and `allowance()` getters are explicitly defined to allow for
 function overloading in deriving contracts where such contracts may return calculated values.
 The respective internal state variables are `totSupply` `balance` and `allowed`
+
+This implimentation uses a single internal transfer function `xfer(from, to, amount)` called
+by the overloadable public functions `transfer()` and `transferFrom`.  This allows deriving
+contracts to overload the public functions with additional parameter validation and dynamic
+behaviour without having to rewrite the core transfer logic.
 
 ## Functions
 

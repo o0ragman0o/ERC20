@@ -1,7 +1,7 @@
 /*
 file:   ERC20.sol
-ver:    0.4.2-o0ragman0o
-updated:1-May-2017
+ver:    0.4.3-o0ragman0o
+updated:26-July-2017
 author: Darryl Morris
 email:  o0ragman0o AT gmail.com
 
@@ -12,6 +12,13 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 See MIT Licence for further details.
 <https://opensource.org/licenses/MIT>.
+
+Release Notes
+-------------
+0.4.3-o0ragman0o
+* removed state from interface
+* added abstract functions of public state to interface.
+* included state into contract implimentation
 */
 
 pragma solidity ^0.4.10;
@@ -24,18 +31,6 @@ contract ERC20Interface
 /* Structs */
 
 /* State Valiables */
-
-    /// @return Total amount of tokens
-    uint totSupply;
-    
-    /// @return Token symbol
-    string public symbol;
-    
-    // Token ownership mapping
-    mapping (address => uint) balance;
-    
-    /// Allowances mapping
-    mapping (address => mapping (address => uint)) allowed;
 
 /* Events */
     // Triggered when tokens are transferred.
@@ -57,6 +52,9 @@ contract ERC20Interface
     /// @return The total supply of tokens
     function totalSupply() public constant returns (uint);
     
+    /// @return The trading symbol;
+    function symbol() public constant returns (string);
+
     /// @param _addr The address of a token holder
     /// @return The amount of tokens held by `_addr`
     function balanceOf(address _addr) public constant returns (uint);
@@ -91,7 +89,20 @@ contract ERC20Token is ReentryProtected, ERC20Interface
 {
 
 /* Constants */
-    bytes32 constant public VERSION = "ERC20 0.4.2-o0ragman0o";
+    bytes32 constant public VERSION = "ERC20 0.4.3-o0ragman0o";
+
+/* State */
+    // The Total supply of tokens
+    uint totSupply;
+    
+    /// @return Token symbol
+    string public symbol;
+    
+    // Token ownership mapping
+    mapping (address => uint) balance;
+    
+    /// Allowances mapping
+    mapping (address => mapping (address => uint)) allowed;
 
 /* Funtions Public */
 
