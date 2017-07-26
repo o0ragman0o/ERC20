@@ -1,7 +1,7 @@
 # ERC20
 ### A Re-entry protected and overloadedable implimentation of the ERC20 token standard.
 
-0.4.3-o0ragman0o
+0.4.4-o0ragman0o
 
 updated:26-July-2017
 
@@ -11,7 +11,7 @@ license: MIT
 
 ### ABI
 ```
-[{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_amount","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_amount","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]
+[{"constant":false,"inputs":[{"name":"_spender","type":"address"},{"name":"_value","type":"uint256"}],"name":"approve","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_from","type":"address"},{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"_to","type":"address"},{"name":"_value","type":"uint256"}],"name":"transfer","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"_owner","type":"address"},{"name":"_spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining_","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"VERSION","outputs":[{"name":"","type":"bytes32"}],"payable":false,"type":"function"},{"inputs":[{"name":"_supply","type":"uint256"},{"name":"_symbol","type":"string"}],"payable":false,"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_from","type":"address"},{"indexed":true,"name":"_to","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"_owner","type":"address"},{"indexed":true,"name":"_spender","type":"address"},{"indexed":false,"name":"_value","type":"uint256"}],"name":"Approval","type":"event"}]
 ```
 
 ## Overview
@@ -40,6 +40,12 @@ function totalSupply() public constant returns (uint);
 ```
 Returns the total supply of tokens
 
+### symbol
+```
+function symbol() public constant returns (string);
+```
+Returns the trading symbol of the token
+
 ### balanceOf
 ```
 function balanceOf(address _addr) public constant returns (uint);
@@ -57,7 +63,7 @@ Returns the amount of tokens the `_spender` is allowed to transfer
 
 ### transfer
 ```
-function transfer(address _to, uint256 _amount) external returns (bool);
+function transfer(address _to, uint256 _amount) public returns (bool);
 ```
 Sends the `_amount` of tokens from `msg.sender` to `_to`. Returns success.
 `_to` The address of the recipient
@@ -66,7 +72,7 @@ Sends the `_amount` of tokens from `msg.sender` to `_to`. Returns success.
 ### transferFrom
 ```
 function transferFrom(address _from, address _to, uint256 _amount)
-        external returns (bool);
+        public returns (bool);
 ```
 Sends the `_amount` of tokens from `_from` to `_to` on the condition the amount
 has been approved by `_from`.
@@ -76,7 +82,7 @@ has been approved by `_from`.
 
 ### approve
 ```
-function approve(address _spender, uint256 _amount) external returns (bool);
+function approve(address _spender, uint256 _amount) public returns (bool);
 ```
 Approves and amount of tokens that can be sent by a thrid-party
 `_spender` The address of the approved spender

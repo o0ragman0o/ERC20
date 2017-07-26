@@ -1,6 +1,6 @@
 /*
 file:   ERC20.sol
-ver:    0.4.3-o0ragman0o
+ver:    0.4.4-o0ragman0o
 updated:26-July-2017
 author: Darryl Morris
 email:  o0ragman0o AT gmail.com
@@ -15,7 +15,7 @@ See MIT Licence for further details.
 
 Release Notes
 -------------
-0.4.3-o0ragman0o
+0.4.4-o0ragman0o
 * removed state from interface
 * added abstract functions of public state to interface.
 * included state into contract implimentation
@@ -52,7 +52,7 @@ contract ERC20Interface
     /// @return The total supply of tokens
     function totalSupply() public constant returns (uint);
     
-    /// @return The trading symbol;
+    // /// @return The trading symbol;
     function symbol() public constant returns (string);
 
     /// @param _addr The address of a token holder
@@ -68,7 +68,7 @@ contract ERC20Interface
     /// @notice Send `_amount` of tokens from `msg.sender` to `_to`
     /// @param _to The address of the recipient
     /// @param _amount The amount of tokens to transfer
-    function transfer(address _to, uint256 _amount) external returns (bool);
+    function transfer(address _to, uint256 _amount) public returns (bool);
 
     /// @notice Send `_amount` of tokens from `_from` to `_to` on the condition
     /// it is approved by `_from`
@@ -76,32 +76,32 @@ contract ERC20Interface
     /// @param _to The address of the recipient
     /// @param _amount The amount of tokens to transfer
     function transferFrom(address _from, address _to, uint256 _amount)
-        external returns (bool);
+        public returns (bool);
 
     /// @notice `msg.sender` approves `_spender` to spend `_amount` tokens on
     /// its behalf
     /// @param _spender The address of the approved spender
     /// @param _amount The amount of tokens to transfer
-    function approve(address _spender, uint256 _amount) external returns (bool);
+    function approve(address _spender, uint256 _amount) public returns (bool);
 }
 
 contract ERC20Token is ReentryProtected, ERC20Interface
 {
 
 /* Constants */
-    bytes32 constant public VERSION = "ERC20 0.4.3-o0ragman0o";
+    bytes32 constant public VERSION = "ERC20 0.4.4-o0ragman0o";
 
 /* State */
     // The Total supply of tokens
     uint totSupply;
     
     /// @return Token symbol
-    string public symbol;
+    string sym;
     
     // Token ownership mapping
     mapping (address => uint) balance;
     
-    /// Allowances mapping
+    // Allowances mapping
     mapping (address => mapping (address => uint)) allowed;
 
 /* Funtions Public */
@@ -112,8 +112,16 @@ contract ERC20Token is ReentryProtected, ERC20Interface
         // multiplication overflow
         require(_supply < 2**128);
         totSupply = _supply;
-        symbol = _symbol;
+        sym = _symbol;
         balance[msg.sender] = totSupply;
+    }
+    
+    function symbol()
+        public
+        constant
+        returns (string)
+    {
+        return sym;
     }
     
     // Using an explicit getter allows for function overloading    
@@ -147,7 +155,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
     // Send _value amount of tokens to address _to
     // Reentry protection prevents attacks upon the state
     function transfer(address _to, uint256 _value)
-        external
+        public
         noReentry
         returns (bool)
     {
@@ -157,7 +165,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
     // Send _value amount of tokens from address _from to address _to
     // Reentry protection prevents attacks upon the state
     function transferFrom(address _from, address _to, uint256 _value)
-        external
+        public
         noReentry
         returns (bool)
     {
@@ -181,7 +189,7 @@ contract ERC20Token is ReentryProtected, ERC20Interface
     // Approves a third-party spender
     // Reentry protection prevents attacks upon the state
     function approve(address _spender, uint256 _value)
-        external
+        public
         noReentry
         returns (bool)
     {
